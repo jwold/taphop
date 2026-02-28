@@ -105,20 +105,6 @@ function App() {
     setWarning('')
   }, [])
 
-  const undoLastRow = useCallback(() => {
-    setSecretPath((prev) => {
-      const next = [...prev]
-      // Find the last non-null row and clear it
-      for (let r = ROWS - 1; r >= 0; r--) {
-        if (next[r] !== null) {
-          next[r] = null
-          return next
-        }
-      }
-      return next
-    })
-  }, [])
-
   const lockPath = useCallback(() => {
     const incomplete = secretPath.some((v) => v === null)
     if (incomplete) {
@@ -234,11 +220,8 @@ function App() {
               <button className="btn btn-lock" onClick={lockPath}>
                 Lock Path &amp; Play
               </button>
-              <button className="btn btn-randomize" onClick={randomizePath}>
-                Randomize
-              </button>
-              <button className="btn btn-undo" onClick={undoLastRow}>
-                Undo
+              <button className="btn btn-dice" onClick={randomizePath} aria-label="Randomize path">
+                🎲
               </button>
             </>
           )}

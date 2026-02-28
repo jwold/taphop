@@ -72,12 +72,11 @@
   background: #9c27b0;
 }
 
-.btn-randomize {
-  background: #00897b;
-}
-
-.btn-undo {
-  background: #757575;
+.btn-dice {
+  background: transparent;
+  font-size: 1.6rem;
+  padding: 6px 10px;
+  line-height: 1;
 }
 
 .btn-disabled {
