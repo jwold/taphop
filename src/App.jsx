@@ -151,14 +151,14 @@ function App() {
     const classes = ['cell']
 
     if (mode === 'setup') {
+      const prevCol = row === 0 ? null : secretPath[row - 1]
+      const isValid = (row === 0 || prevCol !== null) && getValidCols(prevCol).includes(col)
       if (secretPath[row] === col) {
         classes.push('setup-selected')
-      } else if (row === 0 || secretPath[row - 1] !== null) {
-        // Highlight valid options when previous row has a pick
-        const prevCol = row === 0 ? null : secretPath[row - 1]
-        if (getValidCols(prevCol).includes(col)) {
-          classes.push('option')
-        }
+      } else if (isValid) {
+        classes.push('option')
+      } else {
+        classes.push('disabled')
       }
     }
 

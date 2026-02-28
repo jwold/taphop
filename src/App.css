@@ -125,6 +125,12 @@
   justify-content: center;
 }
 
+/* Disabled: not a valid option */
+.cell.disabled {
+  opacity: 0.15;
+  pointer-events: none;
+}
+
 /* Option: valid next move */
 .cell.option {
   background: #1a3a1a;
