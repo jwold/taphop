@@ -14,19 +14,31 @@
 
 /* ── Header / Controls ── */
 .header {
-  text-align: center;
   margin-bottom: 12px;
 }
 
-.header h1 {
+.title-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.title-row h1 {
   font-size: 1.6rem;
-  margin-bottom: 4px;
+  margin: 0;
   color: #fff;
+}
+
+.title-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
 .mode-label {
   font-size: 0.85rem;
   color: #888;
+  margin-top: 4px;
   margin-bottom: 8px;
 }
 
@@ -35,14 +47,6 @@
   font-weight: 600;
   color: #64b5f6;
   margin-bottom: 8px;
-}
-
-.controls {
-  display: flex;
-  gap: 8px;
-  justify-content: center;
-  flex-wrap: wrap;
-  margin-bottom: 14px;
 }
 
 .btn {
@@ -75,6 +79,13 @@
 .btn-dice {
   background: transparent;
   font-size: 1.6rem;
+  padding: 6px 10px;
+  line-height: 1;
+}
+
+.btn-icon {
+  background: transparent;
+  font-size: 1.4rem;
   padding: 6px 10px;
   line-height: 1;
 }

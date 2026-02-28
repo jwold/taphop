@@ -204,33 +204,31 @@ function App() {
       <div className="game-container">
         {/* Header */}
         <div className="header">
-          <h1>Secret Path</h1>
+          <div className="title-row">
+            <h1>Secret Path</h1>
+            <div className="title-actions">
+              {mode === 'setup' && (
+                <>
+                  <button className="btn btn-dice" onClick={randomizePath} aria-label="Randomize path">
+                    🎲
+                  </button>
+                  <button className="btn btn-lock" onClick={lockPath}>
+                    Play
+                  </button>
+                </>
+              )}
+              {mode === 'play' && (
+                <button className="btn btn-icon" onClick={editPath} aria-label="Edit path">
+                  ✏️
+                </button>
+              )}
+            </div>
+          </div>
           <div className="mode-label">
             {mode === 'setup' && 'Leader: tap one square per row'}
             {mode === 'play' && ''}
             {mode === 'win' && ''}
           </div>
-
-        </div>
-
-        {/* Controls */}
-        <div className="controls">
-          {mode === 'setup' && (
-            <>
-              <button className="btn btn-lock" onClick={lockPath}>
-                Play
-              </button>
-              <button className="btn btn-dice" onClick={randomizePath} aria-label="Randomize path">
-                🎲
-              </button>
-            </>
-          )}
-
-          {mode === 'play' && (
-            <button className="btn btn-edit" onClick={editPath}>
-              Edit Path
-            </button>
-          )}
         </div>
 
         {/* Warning */}
