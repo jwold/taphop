@@ -41,8 +41,8 @@ function Confetti() {
 }
 
 function App() {
-  // Game modes: 'idle' | 'setup' | 'play' | 'win'
-  const [mode, setMode] = useState('idle')
+  // Game modes: 'setup' | 'play' | 'win'
+  const [mode, setMode] = useState('setup')
   // Secret path: array of 10 column indices (0-4), null = not set
   const [secretPath, setSecretPath] = useState(() => Array(ROWS).fill(null))
   // Play state
@@ -210,7 +210,6 @@ function App() {
         <div className="header">
           <h1>Secret Path</h1>
           <div className="mode-label">
-            {mode === 'idle' && 'Tap "Setup Path" to begin'}
             {mode === 'setup' && 'Leader: tap one square per row'}
             {mode === 'play' && ''}
             {mode === 'win' && ''}
@@ -220,12 +219,6 @@ function App() {
 
         {/* Controls */}
         <div className="controls">
-          {mode === 'idle' && (
-            <button className="btn btn-setup" onClick={startSetup}>
-              Setup Path
-            </button>
-          )}
-
           {mode === 'setup' && (
             <button className="btn btn-lock" onClick={lockPath}>
               Lock Path &amp; Play
