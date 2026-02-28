@@ -218,7 +218,7 @@ function App() {
           {mode === 'setup' && (
             <>
               <button className="btn btn-lock" onClick={lockPath}>
-                Lock Path &amp; Play
+                Play
               </button>
               <button className="btn btn-dice" onClick={randomizePath} aria-label="Randomize path">
                 🎲
