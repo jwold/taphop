@@ -6,26 +6,69 @@ const MAX_ROWS = 12
 const MIN_COLS = 2
 const MAX_COLS = 5
 
-function FrogIcon() {
+function FrogIcon({ size = 32 }) {
   return (
-    <svg width="32" height="32" viewBox="0 0 32 32" fill="none" aria-hidden="true" className="logo-icon">
-      {/* Body */}
+    <svg width={size} height={size} viewBox="0 0 32 32" fill="none" aria-hidden="true" className="logo-icon">
       <ellipse cx="16" cy="20" rx="11" ry="8" fill="#4caf50" />
-      {/* Belly */}
       <ellipse cx="16" cy="22" rx="7" ry="5" fill="#a5d6a7" />
-      {/* Left eye */}
       <circle cx="10" cy="11" r="5" fill="#4caf50" />
       <circle cx="10" cy="11" r="3.5" fill="#fff" />
       <circle cx="10.5" cy="10.5" r="1.8" fill="#1b5e20" />
-      {/* Right eye */}
       <circle cx="22" cy="11" r="5" fill="#4caf50" />
       <circle cx="22" cy="11" r="3.5" fill="#fff" />
       <circle cx="22.5" cy="10.5" r="1.8" fill="#1b5e20" />
-      {/* Mouth */}
       <path d="M11 22 Q16 26 21 22" stroke="#1b5e20" strokeWidth="1.2" fill="none" strokeLinecap="round" />
-      {/* Cheeks */}
       <circle cx="9" cy="20" r="2" fill="#ff8a80" opacity="0.4" />
       <circle cx="23" cy="20" r="2" fill="#ff8a80" opacity="0.4" />
+    </svg>
+  )
+}
+
+function DiceIcon() {
+  return (
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <rect x="2" y="2" width="20" height="20" rx="4" fill="#fff" />
+      <rect x="2" y="2" width="20" height="20" rx="4" stroke="#ccc" strokeWidth="0.5" />
+      <circle cx="7.5" cy="7.5" r="2" fill="#1b5e20" />
+      <circle cx="16.5" cy="7.5" r="2" fill="#1b5e20" />
+      <circle cx="12" cy="12" r="2" fill="#1b5e20" />
+      <circle cx="7.5" cy="16.5" r="2" fill="#1b5e20" />
+      <circle cx="16.5" cy="16.5" r="2" fill="#1b5e20" />
+    </svg>
+  )
+}
+
+function PencilIcon() {
+  return (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <path d="M16.5 3.5l4 4L7 21H3v-4L16.5 3.5z" fill="#ffd54f" stroke="#f9a825" strokeWidth="1" strokeLinejoin="round" />
+      <path d="M3 21l1.5-4L7 21H3z" fill="#ffab91" stroke="#f9a825" strokeWidth="0.5" />
+      <path d="M14.5 5.5l4 4" stroke="#f9a825" strokeWidth="1" />
+      <path d="M3 21l0.8-0.8" stroke="#555" strokeWidth="0.8" strokeLinecap="round" />
+    </svg>
+  )
+}
+
+function PartyIcon() {
+  return (
+    <svg width="80" height="80" viewBox="0 0 32 32" fill="none" aria-hidden="true">
+      {/* Cone */}
+      <path d="M10 6L16 28L22 6" fill="#ffd54f" stroke="#f9a825" strokeWidth="0.8" strokeLinejoin="round" />
+      <path d="M10 6Q16 10 22 6" fill="#ff8a65" stroke="#f9a825" strokeWidth="0.5" />
+      {/* Stripes */}
+      <path d="M11.5 10L20.5 10" stroke="#ff8a65" strokeWidth="1" strokeLinecap="round" />
+      <path d="M13 15L19 15" stroke="#4fc3f7" strokeWidth="1" strokeLinecap="round" />
+      <path d="M14.5 20L17.5 20" stroke="#ce93d8" strokeWidth="1" strokeLinecap="round" />
+      {/* Stars */}
+      <circle cx="6" cy="10" r="1.5" fill="#ff6b6b" />
+      <circle cx="26" cy="8" r="1.2" fill="#4fc3f7" />
+      <circle cx="8" cy="4" r="1" fill="#ffd54f" />
+      <circle cx="24" cy="14" r="1.3" fill="#ce93d8" />
+      <circle cx="5" cy="18" r="0.8" fill="#6bcb77" />
+      <circle cx="27" cy="20" r="1" fill="#ff8a65" />
+      {/* Streamers */}
+      <path d="M7 6Q4 8 6 12" stroke="#ff6b6b" strokeWidth="1" fill="none" strokeLinecap="round" />
+      <path d="M25 6Q28 9 25 13" stroke="#4fc3f7" strokeWidth="1" fill="none" strokeLinecap="round" />
     </svg>
   )
 }
@@ -277,33 +320,31 @@ function App() {
 
         {/* Header */}
         <header className="header">
-          <div className="title-row">
-            <div className="logo">
-              <FrogIcon />
-              <h1>Tap Hop</h1>
-            </div>
-            <div className="title-actions">
-              {mode === 'setup' && (
-                <>
-                  <button className="btn btn-dice" onClick={randomizePath} aria-label="Randomize path">
-                    <span aria-hidden="true">🎲</span>
-                  </button>
-                  <button className="btn btn-lock" onClick={lockPath}>
-                    Play
-                  </button>
-                </>
-              )}
-              {mode === 'play' && (
-                <button className="btn btn-icon" onClick={editPath} aria-label="Edit path">
-                  <span aria-hidden="true">✏️</span>
+          <div className="logo">
+            <FrogIcon />
+            <h1>Tap Hop</h1>
+          </div>
+          <div className="title-actions">
+            {mode === 'setup' && (
+              <>
+                <button className="btn btn-dice" onClick={randomizePath} aria-label="Randomize path">
+                  <DiceIcon />
                 </button>
-              )}
-              {mode === 'lose' && (
-                <button className="btn btn-retry" onClick={playAgain}>
-                  Retry
+                <button className="btn btn-lock" onClick={lockPath}>
+                  Play
                 </button>
-              )}
-            </div>
+              </>
+            )}
+            {mode === 'play' && (
+              <button className="btn btn-icon" onClick={editPath} aria-label="Edit path">
+                <PencilIcon />
+              </button>
+            )}
+            {mode === 'lose' && (
+              <button className="btn btn-retry" onClick={playAgain}>
+                Retry
+              </button>
+            )}
           </div>
         </header>
 
@@ -390,7 +431,7 @@ function App() {
         <>
           <Confetti />
           <div className="win-overlay" role="dialog" aria-label="You won">
-            <div className="emoji" aria-hidden="true">🎉</div>
+            <PartyIcon />
             <h2>YOU MADE IT!</h2>
             <button className="btn btn-setup" onClick={playAgain}>
               Play Again
