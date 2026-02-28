@@ -401,7 +401,6 @@ function App() {
         <div className="grid" role="grid" aria-label={`${rows} steps, ${cols} choices each`}>
             {Array.from({ length: rows }, (_, r) => (
               <div className={getRowClass(r)} key={r} role="row" style={{ gridTemplateRows: `repeat(${cols}, 1fr)` }}>
-                <span className="col-number" aria-hidden="true">{r + 1}</span>
                 {Array.from({ length: cols }, (_, c) => {
                   const interactive = isCellInteractive(r, c)
                   return (
