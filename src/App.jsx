@@ -49,16 +49,15 @@ function Confetti() {
 }
 
 function App() {
-  // Game modes: 'setup' | 'play' | 'win'
+  // Game modes: 'setup' | 'play' | 'win' | 'lose'
   const [mode, setMode] = useState('setup')
   // Secret path: array of 10 column indices (0-4), null = not set
   const [secretPath, setSecretPath] = useState(() => Array(ROWS).fill(null))
   // Play state
   const [activeRow, setActiveRow] = useState(0)
   const [completedCells, setCompletedCells] = useState([])
-  // Wrong cell flash
+  // Wrong cell
   const [wrongCell, setWrongCell] = useState(null)
-  const wrongTimer = useRef(null)
   // Warning message
   const [warning, setWarning] = useState('')
 
@@ -132,14 +131,9 @@ function App() {
           setActiveRow(row + 1)
         }
       } else {
-        // Wrong — flash red then reset
+        // Wrong — freeze the board with the wrong cell shown
         setWrongCell({ row, col })
-        clearTimeout(wrongTimer.current)
-        wrongTimer.current = setTimeout(() => {
-          setWrongCell(null)
-          setActiveRow(0)
-          setCompletedCells([])
-        }, 400)
+        setMode('lose')
       }
     },
     [mode, activeRow, secretPath]
@@ -155,6 +149,7 @@ function App() {
   const playAgain = useCallback(() => {
     setActiveRow(0)
     setCompletedCells([])
+    setWrongCell(null)
     setMode('play')
   }, [])
 
@@ -173,7 +168,7 @@ function App() {
       }
     }
 
-    if (mode === 'play' || mode === 'win') {
+    if (mode === 'play' || mode === 'win' || mode === 'lose') {
       if (completedCells.some((c) => c.row === row && c.col === col)) {
         classes.push('correct')
       }
@@ -193,6 +188,7 @@ function App() {
 
   const getRowClass = (row) => {
     if (mode === 'setup') return 'grid-row'
+    if (mode === 'lose') return 'grid-row'
     if (mode !== 'play') return 'grid-row inactive'
 
     if (row === activeRow) return 'grid-row active-row'
@@ -223,6 +219,11 @@ function App() {
               {mode === 'play' && (
                 <button className="btn btn-icon" onClick={editPath} aria-label="Edit path">
                   ✏️
+                </button>
+              )}
+              {mode === 'lose' && (
+                <button className="btn btn-retry" onClick={playAgain}>
+                  Retry
                 </button>
               )}
             </div>

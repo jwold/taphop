@@ -94,6 +94,10 @@
   line-height: 1;
 }
 
+.btn-retry {
+  background: #e53935;
+}
+
 .btn-disabled {
   opacity: 0.4;
   cursor: not-allowed;
