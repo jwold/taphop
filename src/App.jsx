@@ -94,6 +94,31 @@ function App() {
     [mode, secretPath]
   )
 
+  const randomizePath = useCallback(() => {
+    const path = Array(ROWS).fill(null)
+    path[0] = Math.floor(Math.random() * COLS)
+    for (let r = 1; r < ROWS; r++) {
+      const valid = getValidCols(path[r - 1])
+      path[r] = valid[Math.floor(Math.random() * valid.length)]
+    }
+    setSecretPath(path)
+    setWarning('')
+  }, [])
+
+  const undoLastRow = useCallback(() => {
+    setSecretPath((prev) => {
+      const next = [...prev]
+      // Find the last non-null row and clear it
+      for (let r = ROWS - 1; r >= 0; r--) {
+        if (next[r] !== null) {
+          next[r] = null
+          return next
+        }
+      }
+      return next
+    })
+  }, [])
+
   const lockPath = useCallback(() => {
     const incomplete = secretPath.some((v) => v === null)
     if (incomplete) {
@@ -205,9 +230,17 @@ function App() {
         {/* Controls */}
         <div className="controls">
           {mode === 'setup' && (
-            <button className="btn btn-lock" onClick={lockPath}>
-              Lock Path &amp; Play
-            </button>
+            <>
+              <button className="btn btn-lock" onClick={lockPath}>
+                Lock Path &amp; Play
+              </button>
+              <button className="btn btn-randomize" onClick={randomizePath}>
+                Randomize
+              </button>
+              <button className="btn btn-undo" onClick={undoLastRow}>
+                Undo
+              </button>
+            </>
           )}
 
           {mode === 'play' && (

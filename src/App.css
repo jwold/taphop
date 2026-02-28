@@ -72,6 +72,14 @@
   background: #9c27b0;
 }
 
+.btn-randomize {
+  background: #00897b;
+}
+
+.btn-undo {
+  background: #757575;
+}
+
 .btn-disabled {
   opacity: 0.4;
   cursor: not-allowed;
