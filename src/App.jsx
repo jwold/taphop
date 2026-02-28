@@ -2,7 +2,7 @@ import { useState, useCallback, useRef } from 'react'
 import './App.css'
 
 const MIN_ROWS = 5
-const MAX_ROWS = 12
+const MAX_ROWS = 5
 const MIN_COLS = 2
 const MAX_COLS = 5
 
@@ -119,12 +119,12 @@ function Confetti() {
 
 function App() {
   // Grid size
-  const [rows, setRows] = useState(10)
+  const [rows, setRows] = useState(5)
   const [cols, setCols] = useState(5)
   // Game modes: 'setup' | 'play' | 'win' | 'lose'
   const [mode, setMode] = useState('setup')
   // Secret path: array of row column indices, null = not set
-  const [secretPath, setSecretPath] = useState(() => Array(10).fill(null))
+  const [secretPath, setSecretPath] = useState(() => Array(5).fill(null))
   // Play state
   const [activeRow, setActiveRow] = useState(0)
   const [completedCells, setCompletedCells] = useState([])
