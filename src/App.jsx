@@ -126,11 +126,11 @@ function App() {
           } else {
             setActiveRow(row + 1)
           }
-        }, 800)
+        }, 400)
 
         bannerTimeout.current = setTimeout(() => {
           setBanner(null)
-        }, 1200)
+        }, 600)
       } else {
         // Wrong!
         setFlash({ row, col, type: 'wrong' })
@@ -143,11 +143,11 @@ function App() {
           setFlash(null)
           setActiveRow(0)
           setCompletedCells([])
-        }, 1500)
+        }, 700)
 
         bannerTimeout.current = setTimeout(() => {
           setBanner(null)
-        }, 1500)
+        }, 700)
       }
     },
     [mode, activeRow, secretPath, flash]
