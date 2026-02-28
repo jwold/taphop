@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useRef } from 'react'
 import './App.css'
 
 const ROWS = 10
@@ -48,6 +48,9 @@ function App() {
   // Play state
   const [activeRow, setActiveRow] = useState(0)
   const [completedCells, setCompletedCells] = useState([])
+  // Wrong cell flash
+  const [wrongCell, setWrongCell] = useState(null)
+  const wrongTimer = useRef(null)
   // Warning message
   const [warning, setWarning] = useState('')
 
@@ -99,9 +102,14 @@ function App() {
           setActiveRow(row + 1)
         }
       } else {
-        // Wrong — reset to start
-        setActiveRow(0)
-        setCompletedCells([])
+        // Wrong — flash red then reset
+        setWrongCell({ row, col })
+        clearTimeout(wrongTimer.current)
+        wrongTimer.current = setTimeout(() => {
+          setWrongCell(null)
+          setActiveRow(0)
+          setCompletedCells([])
+        }, 400)
       }
     },
     [mode, activeRow, secretPath]
@@ -136,6 +144,9 @@ function App() {
     if (mode === 'play' || mode === 'win') {
       if (completedCells.some((c) => c.row === row && c.col === col)) {
         classes.push('correct')
+      }
+      if (wrongCell && wrongCell.row === row && wrongCell.col === col) {
+        classes.push('flash-wrong')
       }
     }
 
