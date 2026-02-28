@@ -205,7 +205,10 @@ function App() {
         {/* Header */}
         <div className="header">
           <div className="title-row">
-            <h1>Secret Path</h1>
+            <div className="logo">
+              <span className="logo-icon">🐸</span>
+              <h1>Tap Hop</h1>
+            </div>
             <div className="title-actions">
               {mode === 'setup' && (
                 <>
@@ -223,11 +226,6 @@ function App() {
                 </button>
               )}
             </div>
-          </div>
-          <div className="mode-label">
-            {mode === 'setup' && 'Leader: tap one square per row'}
-            {mode === 'play' && ''}
-            {mode === 'win' && ''}
           </div>
         </div>
 

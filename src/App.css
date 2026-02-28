@@ -23,7 +23,18 @@
   justify-content: space-between;
 }
 
-.title-row h1 {
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.logo-icon {
+  font-size: 1.8rem;
+  line-height: 1;
+}
+
+.logo h1 {
   font-size: 1.6rem;
   margin: 0;
   color: #fff;
@@ -33,13 +44,6 @@
   display: flex;
   align-items: center;
   gap: 8px;
-}
-
-.mode-label {
-  font-size: 0.85rem;
-  color: #888;
-  margin-top: 4px;
-  margin-bottom: 8px;
 }
 
 .progress {
