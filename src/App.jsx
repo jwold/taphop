@@ -242,22 +242,36 @@ function App() {
               <button
                 className="btn btn-step"
                 disabled={cols <= MIN_COLS}
-                onClick={() => { setCols((c) => c - 1); setSecretPath(Array(rows).fill(null)) }}
+                onClick={() => {
+                  const newCols = cols - 1
+                  setCols(newCols)
+                  setSecretPath((prev) => prev.map((v) => v !== null && v >= newCols ? null : v).map((v, i, arr) => {
+                    if (i === 0 || v === null) return v
+                    if (arr[i - 1] === null) return null
+                    return getValidCols(arr[i - 1], newCols).includes(v) ? v : null
+                  }))
+                }}
               >−</button>
               <button
                 className="btn btn-step"
                 disabled={cols >= MAX_COLS}
-                onClick={() => { setCols((c) => c + 1); setSecretPath(Array(rows).fill(null)) }}
+                onClick={() => setCols((c) => c + 1)}
               >+</button>
               <button
                 className="btn btn-step"
                 disabled={rows <= MIN_ROWS}
-                onClick={() => { setRows((r) => r - 1); setSecretPath(Array(rows - 1).fill(null)) }}
+                onClick={() => {
+                  setRows((r) => r - 1)
+                  setSecretPath((prev) => prev.slice(0, -1))
+                }}
               >↑</button>
               <button
                 className="btn btn-step"
                 disabled={rows >= MAX_ROWS}
-                onClick={() => { setRows((r) => r + 1); setSecretPath(Array(rows + 1).fill(null)) }}
+                onClick={() => {
+                  setRows((r) => r + 1)
+                  setSecretPath((prev) => [...prev, null])
+                }}
               >↓</button>
             </div>
           </div>
