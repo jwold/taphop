@@ -239,7 +239,6 @@ function App() {
         {mode === 'setup' && (
           <div className="size-controls">
             <div className="size-stepper">
-              <span className="size-label">{cols}×{rows}</span>
               <button
                 className="btn btn-step"
                 disabled={cols <= MIN_COLS}
