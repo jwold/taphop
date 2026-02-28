@@ -2,9 +2,9 @@ import { useState, useCallback, useRef } from 'react'
 import './App.css'
 
 const MIN_ROWS = 2
-const MAX_ROWS = 10
+const MAX_ROWS = 5
 const MIN_COLS = 2
-const MAX_COLS = 5
+const MAX_COLS = 10
 
 function FrogIcon({ size = 32 }) {
   return (
@@ -73,11 +73,11 @@ function PartyIcon() {
   )
 }
 
-function getValidCols(prevCol, cols) {
-  if (prevCol === null || prevCol === undefined) return Array.from({ length: cols }, (_, i) => i)
-  const valid = [prevCol]
-  if (prevCol > 0) valid.push(prevCol - 1)
-  if (prevCol < cols - 1) valid.push(prevCol + 1)
+function getValidRows(prevRow, rows) {
+  if (prevRow === null || prevRow === undefined) return Array.from({ length: rows }, (_, i) => i)
+  const valid = [prevRow]
+  if (prevRow > 0) valid.push(prevRow - 1)
+  if (prevRow < rows - 1) valid.push(prevRow + 1)
   return valid
 }
 
@@ -119,14 +119,14 @@ function Confetti() {
 
 function App() {
   // Grid size
-  const [rows, setRows] = useState(5)
-  const [cols, setCols] = useState(5)
+  const [rows, setRows] = useState(5)   // visual rows (height, 2-5)
+  const [cols, setCols] = useState(5)   // visual columns (steps, 2-10)
   // Game modes: 'setup' | 'play' | 'win' | 'lose'
   const [mode, setMode] = useState('setup')
-  // Secret path: array of row column indices, null = not set
+  // Secret path: array of column entries, each is a row index
   const [secretPath, setSecretPath] = useState(() => Array(5).fill(null))
   // Play state
-  const [activeRow, setActiveRow] = useState(0)
+  const [activeCol, setActiveCol] = useState(0)
   const [completedCells, setCompletedCells] = useState([])
   // Wrong cell
   const [wrongCell, setWrongCell] = useState(null)
@@ -135,118 +135,118 @@ function App() {
 
   const startSetup = useCallback(() => {
     setMode('setup')
-    setSecretPath(Array(rows).fill(null))
-    setActiveRow(0)
+    setSecretPath(Array(cols).fill(null))
+    setActiveCol(0)
     setCompletedCells([])
     setWarning('')
-  }, [rows])
+  }, [cols])
 
   const handleSetupTap = useCallback(
-    (row, col) => {
+    (col, row) => {
       if (mode !== 'setup') return
-      const prevCol = row === 0 ? null : secretPath[row - 1]
-      if (!getValidCols(prevCol, cols).includes(col)) return
+      const prevRow = col === 0 ? null : secretPath[col - 1]
+      if (!getValidRows(prevRow, rows).includes(row)) return
       setWarning('')
       setSecretPath((prev) => {
         const next = [...prev]
-        next[row] = col
-        // Clear downstream rows that are no longer adjacent
-        for (let r = row + 1; r < rows; r++) {
-          if (next[r] === null) break
-          const valid = getValidCols(next[r - 1], cols)
-          if (!valid.includes(next[r])) {
-            for (let clear = r; clear < rows; clear++) next[clear] = null
+        next[col] = row
+        // Clear downstream columns that are no longer adjacent
+        for (let c = col + 1; c < cols; c++) {
+          if (next[c] === null) break
+          const valid = getValidRows(next[c - 1], rows)
+          if (!valid.includes(next[c])) {
+            for (let clear = c; clear < cols; clear++) next[clear] = null
             break
           }
         }
         return next
       })
     },
-    [mode, secretPath, rows, cols]
+    [mode, secretPath, cols, rows]
   )
 
   const randomizePath = useCallback(() => {
-    const path = Array(rows).fill(null)
-    path[0] = Math.floor(Math.random() * cols)
-    for (let r = 1; r < rows; r++) {
-      const valid = getValidCols(path[r - 1], cols)
-      path[r] = valid[Math.floor(Math.random() * valid.length)]
+    const path = Array(cols).fill(null)
+    path[0] = Math.floor(Math.random() * rows)
+    for (let c = 1; c < cols; c++) {
+      const valid = getValidRows(path[c - 1], rows)
+      path[c] = valid[Math.floor(Math.random() * valid.length)]
     }
     setSecretPath(path)
     setWarning('')
-  }, [rows, cols])
+  }, [cols, rows])
 
   const lockPath = useCallback(() => {
     const incomplete = secretPath.some((v) => v === null)
     if (incomplete) {
-      setWarning('Please select a square for every row.')
+      setWarning('Please select a square for every column.')
       return
     }
     setMode('play')
-    setActiveRow(0)
+    setActiveCol(0)
     setCompletedCells([])
     setWarning('')
   }, [secretPath])
 
   const handlePlayTap = useCallback(
-    (row, col) => {
+    (col, row) => {
       if (mode !== 'play') return
-      if (row !== activeRow) return
+      if (col !== activeCol) return
 
-      if (col === secretPath[row]) {
+      if (row === secretPath[col]) {
         // Correct!
-        setCompletedCells((prev) => [...prev, { row, col }])
+        setCompletedCells((prev) => [...prev, { col, row }])
 
-        if (row === rows - 1) {
+        if (col === cols - 1) {
           setMode('win')
         } else {
-          setActiveRow(row + 1)
+          setActiveCol(col + 1)
         }
       } else {
         // Wrong — freeze the board with the wrong cell shown
-        setWrongCell({ row, col })
+        setWrongCell({ col, row })
         setMode('lose')
       }
     },
-    [mode, activeRow, secretPath, rows]
+    [mode, activeCol, secretPath, cols]
   )
 
   const editPath = useCallback(() => {
     setMode('setup')
-    setActiveRow(0)
+    setActiveCol(0)
     setCompletedCells([])
     setWarning('')
   }, [])
 
   const playAgain = useCallback(() => {
-    setActiveRow(0)
+    setActiveCol(0)
     setCompletedCells([])
     setWrongCell(null)
     setMode('play')
   }, [])
 
-  const getCellState = (row, col) => {
+  const getCellState = (col, row) => {
     if (mode === 'setup') {
-      if (secretPath[row] === col) return 'selected'
-      const prevCol = row === 0 ? null : secretPath[row - 1]
-      const isValid = (row === 0 || prevCol !== null) && getValidCols(prevCol, cols).includes(col)
+      if (secretPath[col] === row) return 'selected'
+      const prevRow = col === 0 ? null : secretPath[col - 1]
+      const isValid = (col === 0 || prevRow !== null) && getValidRows(prevRow, rows).includes(row)
       if (isValid) return 'option'
       return 'disabled'
     }
     if (mode === 'play' || mode === 'win' || mode === 'lose') {
-      if (wrongCell && wrongCell.row === row && wrongCell.col === col) return 'wrong'
-      if (completedCells.some((c) => c.row === row && c.col === col)) return 'correct'
-      if (mode === 'play' && row === activeRow) {
-        const prevCol = row === 0 ? null : secretPath[row - 1]
-        if (getValidCols(prevCol, cols).includes(col)) return 'option'
+      if (wrongCell && wrongCell.col === col && wrongCell.row === row) return 'wrong'
+      if (completedCells.some((c) => c.col === col && c.row === row)) return 'correct'
+      if (mode === 'play' && col === activeCol) {
+        const prevRow = col === 0 ? null : secretPath[col - 1]
+        if (getValidRows(prevRow, rows).includes(row)) return 'option'
       }
     }
     return 'empty'
   }
 
-  const getCellClass = (row, col) => {
+  const getCellClass = (col, row) => {
     const classes = ['cell']
-    const state = getCellState(row, col)
+    const state = getCellState(col, row)
 
     if (mode === 'setup') {
       if (state === 'selected') classes.push('setup-selected')
@@ -263,9 +263,9 @@ function App() {
     return classes.join(' ')
   }
 
-  const getCellLabel = (row, col) => {
-    const state = getCellState(row, col)
-    const pos = `Row ${row + 1}, column ${col + 1}`
+  const getCellLabel = (col, row) => {
+    const state = getCellState(col, row)
+    const pos = `Column ${col + 1}, row ${row + 1}`
     if (mode === 'setup') {
       if (state === 'selected') return `${pos}, selected`
       if (state === 'option') return `${pos}, available`
@@ -277,35 +277,35 @@ function App() {
     return `${pos}`
   }
 
-  const isCellInteractive = (row, col) => {
-    const state = getCellState(row, col)
+  const isCellInteractive = (col, row) => {
+    const state = getCellState(col, row)
     if (mode === 'setup') return state === 'option' || state === 'selected'
     if (mode === 'play') return state === 'option'
     return false
   }
 
-  const handleCellKey = (e, row, col) => {
+  const handleCellKey = (e, col, row) => {
     if (e.key === 'Enter' || e.key === ' ') {
       e.preventDefault()
-      if (mode === 'setup') handleSetupTap(row, col)
-      if (mode === 'play') handlePlayTap(row, col)
+      if (mode === 'setup') handleSetupTap(col, row)
+      if (mode === 'play') handlePlayTap(col, row)
     }
   }
 
-  const getRowClass = (row) => {
+  const getColClass = (col) => {
     if (mode === 'setup') return 'grid-row'
     if (mode === 'lose') return 'grid-row'
     if (mode !== 'play') return 'grid-row inactive'
 
-    if (row === activeRow) return 'grid-row active-row'
+    if (col === activeCol) return 'grid-row active-row'
     return 'grid-row inactive'
   }
 
   const statusText =
     mode === 'setup'
-      ? `Setup mode. ${secretPath.filter((v) => v !== null).length} of ${rows} rows filled.`
+      ? `Setup mode. ${secretPath.filter((v) => v !== null).length} of ${cols} columns filled.`
       : mode === 'play'
-        ? `Playing. Row ${activeRow + 1} of ${rows}.`
+        ? `Playing. Column ${activeCol + 1} of ${cols}.`
         : mode === 'lose'
           ? 'Wrong cell. Press Retry to try again.'
           : 'You made it!'
@@ -354,39 +354,39 @@ function App() {
             <div className="size-stepper">
               <button
                 className="btn btn-step"
-                disabled={cols <= MIN_COLS}
-                aria-label={`Remove height, currently ${cols} cells tall`}
+                disabled={rows <= MIN_ROWS}
+                aria-label={`Remove row, currently ${rows} rows tall`}
                 onClick={() => {
-                  const newCols = cols - 1
-                  setCols(newCols)
-                  setSecretPath((prev) => prev.map((v) => v !== null && v >= newCols ? null : v).map((v, i, arr) => {
+                  const newRows = rows - 1
+                  setRows(newRows)
+                  setSecretPath((prev) => prev.map((v) => v !== null && v >= newRows ? null : v).map((v, i, arr) => {
                     if (i === 0 || v === null) return v
                     if (arr[i - 1] === null) return null
-                    return getValidCols(arr[i - 1], newCols).includes(v) ? v : null
+                    return getValidRows(arr[i - 1], newRows).includes(v) ? v : null
                   }))
                 }}
               >−</button>
               <button
                 className="btn btn-step"
-                disabled={cols >= MAX_COLS}
-                aria-label={`Add height, currently ${cols} cells tall`}
-                onClick={() => setCols((c) => c + 1)}
+                disabled={rows >= MAX_ROWS}
+                aria-label={`Add row, currently ${rows} rows tall`}
+                onClick={() => setRows((r) => r + 1)}
               >+</button>
               <button
                 className="btn btn-step"
-                disabled={rows <= MIN_ROWS}
-                aria-label={`Remove column, currently ${rows} columns`}
+                disabled={cols <= MIN_COLS}
+                aria-label={`Remove column, currently ${cols} columns`}
                 onClick={() => {
-                  setRows((r) => r - 1)
+                  setCols((c) => c - 1)
                   setSecretPath((prev) => prev.slice(0, -1))
                 }}
               >←</button>
               <button
                 className="btn btn-step"
-                disabled={rows >= MAX_ROWS}
-                aria-label={`Add column, currently ${rows} columns`}
+                disabled={cols >= MAX_COLS}
+                aria-label={`Add column, currently ${cols} columns`}
                 onClick={() => {
-                  setRows((r) => r + 1)
+                  setCols((c) => c + 1)
                   setSecretPath((prev) => [...prev, null])
                 }}
               >→</button>
@@ -398,24 +398,24 @@ function App() {
         {warning && <div className="warning" role="alert">{warning}</div>}
 
         {/* Grid (each step is a vertical column, path goes left to right) */}
-        <div className="grid" role="grid" aria-label={`${rows} steps, ${cols} choices each`}>
-            {Array.from({ length: rows }, (_, r) => (
-              <div className={getRowClass(r)} key={r} role="row" style={{ gridTemplateRows: `repeat(${cols}, 1fr)` }}>
-                {Array.from({ length: cols }, (_, c) => {
-                  const interactive = isCellInteractive(r, c)
+        <div className="grid" role="grid" aria-label={`${cols} steps, ${rows} choices each`}>
+            {Array.from({ length: cols }, (_, c) => (
+              <div className={getColClass(c)} key={c} role="row">
+                {Array.from({ length: rows }, (_, r) => {
+                  const interactive = isCellInteractive(c, r)
                   return (
                     <div
-                      key={c}
-                      className={getCellClass(r, c)}
+                      key={r}
+                      className={getCellClass(c, r)}
                       role="gridcell"
-                      aria-label={getCellLabel(r, c)}
+                      aria-label={getCellLabel(c, r)}
                       tabIndex={interactive ? 0 : -1}
                       aria-disabled={!interactive}
                       onClick={() => {
-                        if (mode === 'setup') handleSetupTap(r, c)
-                        if (mode === 'play') handlePlayTap(r, c)
+                        if (mode === 'setup') handleSetupTap(c, r)
+                        if (mode === 'play') handlePlayTap(c, r)
                       }}
-                      onKeyDown={(e) => handleCellKey(e, r, c)}
+                      onKeyDown={(e) => handleCellKey(e, c, r)}
                     />
                   )
                 })}
