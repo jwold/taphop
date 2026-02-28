@@ -129,6 +129,12 @@
   justify-content: center;
 }
 
+/* Option: valid next move */
+.cell.option {
+  background: #1a3a1a;
+  border-color: #4caf5066;
+}
+
 /* Setup mode: selected square */
 .cell.setup-selected {
   background: #1b5e20;

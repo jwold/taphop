@@ -4,6 +4,14 @@ import './App.css'
 const ROWS = 10
 const COLS = 5
 
+function getValidCols(prevCol) {
+  if (prevCol === null || prevCol === undefined) return [0, 1, 2, 3, 4]
+  const valid = [prevCol]
+  if (prevCol > 0) valid.push(prevCol - 1)
+  if (prevCol < COLS - 1) valid.push(prevCol + 1)
+  return valid
+}
+
 function Confetti() {
   const pieces = useRef(
     Array.from({ length: 60 }, (_, i) => ({
@@ -65,14 +73,25 @@ function App() {
   const handleSetupTap = useCallback(
     (row, col) => {
       if (mode !== 'setup') return
+      const prevCol = row === 0 ? null : secretPath[row - 1]
+      if (!getValidCols(prevCol).includes(col)) return
       setWarning('')
       setSecretPath((prev) => {
         const next = [...prev]
         next[row] = col
+        // Clear downstream rows that are no longer adjacent
+        for (let r = row + 1; r < ROWS; r++) {
+          if (next[r] === null) break
+          const valid = getValidCols(next[r - 1])
+          if (!valid.includes(next[r])) {
+            for (let clear = r; clear < ROWS; clear++) next[clear] = null
+            break
+          }
+        }
         return next
       })
     },
-    [mode]
+    [mode, secretPath]
   )
 
   const lockPath = useCallback(() => {
@@ -137,8 +156,16 @@ function App() {
   const getCellClass = (row, col) => {
     const classes = ['cell']
 
-    if (mode === 'setup' && secretPath[row] === col) {
-      classes.push('setup-selected')
+    if (mode === 'setup') {
+      if (secretPath[row] === col) {
+        classes.push('setup-selected')
+      } else if (row === 0 || secretPath[row - 1] !== null) {
+        // Highlight valid options when previous row has a pick
+        const prevCol = row === 0 ? null : secretPath[row - 1]
+        if (getValidCols(prevCol).includes(col)) {
+          classes.push('option')
+        }
+      }
     }
 
     if (mode === 'play' || mode === 'win') {
@@ -147,6 +174,12 @@ function App() {
       }
       if (wrongCell && wrongCell.row === row && wrongCell.col === col) {
         classes.push('flash-wrong')
+      }
+      if (mode === 'play' && row === activeRow) {
+        const prevCol = row === 0 ? null : secretPath[row - 1]
+        if (getValidCols(prevCol).includes(col)) {
+          classes.push('option')
+        }
       }
     }
 
