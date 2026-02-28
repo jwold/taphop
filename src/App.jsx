@@ -30,7 +30,7 @@ function Confetti() {
   ).current
 
   return (
-    <div className="confetti-container">
+    <div className="confetti-container" aria-hidden="true">
       {pieces.map((p) => (
         <div
           key={p.id}
@@ -158,37 +158,71 @@ function App() {
     setMode('play')
   }, [])
 
-  const getCellClass = (row, col) => {
-    const classes = ['cell']
-
+  const getCellState = (row, col) => {
     if (mode === 'setup') {
+      if (secretPath[row] === col) return 'selected'
       const prevCol = row === 0 ? null : secretPath[row - 1]
       const isValid = (row === 0 || prevCol !== null) && getValidCols(prevCol, cols).includes(col)
-      if (secretPath[row] === col) {
-        classes.push('setup-selected')
-      } else if (isValid) {
-        classes.push('option')
-      } else {
-        classes.push('disabled')
+      if (isValid) return 'option'
+      return 'disabled'
+    }
+    if (mode === 'play' || mode === 'win' || mode === 'lose') {
+      if (wrongCell && wrongCell.row === row && wrongCell.col === col) return 'wrong'
+      if (completedCells.some((c) => c.row === row && c.col === col)) return 'correct'
+      if (mode === 'play' && row === activeRow) {
+        const prevCol = row === 0 ? null : secretPath[row - 1]
+        if (getValidCols(prevCol, cols).includes(col)) return 'option'
       }
+    }
+    return 'empty'
+  }
+
+  const getCellClass = (row, col) => {
+    const classes = ['cell']
+    const state = getCellState(row, col)
+
+    if (mode === 'setup') {
+      if (state === 'selected') classes.push('setup-selected')
+      else if (state === 'option') classes.push('option')
+      else if (state === 'disabled') classes.push('disabled')
     }
 
     if (mode === 'play' || mode === 'win' || mode === 'lose') {
-      if (completedCells.some((c) => c.row === row && c.col === col)) {
-        classes.push('correct')
-      }
-      if (wrongCell && wrongCell.row === row && wrongCell.col === col) {
-        classes.push('flash-wrong')
-      }
-      if (mode === 'play' && row === activeRow) {
-        const prevCol = row === 0 ? null : secretPath[row - 1]
-        if (getValidCols(prevCol, cols).includes(col)) {
-          classes.push('option')
-        }
-      }
+      if (state === 'correct') classes.push('correct')
+      if (state === 'wrong') classes.push('flash-wrong')
+      if (state === 'option') classes.push('option')
     }
 
     return classes.join(' ')
+  }
+
+  const getCellLabel = (row, col) => {
+    const state = getCellState(row, col)
+    const pos = `Row ${row + 1}, column ${col + 1}`
+    if (mode === 'setup') {
+      if (state === 'selected') return `${pos}, selected`
+      if (state === 'option') return `${pos}, available`
+      return `${pos}, unavailable`
+    }
+    if (state === 'correct') return `${pos}, correct`
+    if (state === 'wrong') return `${pos}, wrong`
+    if (state === 'option') return `${pos}, choose this cell`
+    return `${pos}`
+  }
+
+  const isCellInteractive = (row, col) => {
+    const state = getCellState(row, col)
+    if (mode === 'setup') return state === 'option' || state === 'selected'
+    if (mode === 'play') return state === 'option'
+    return false
+  }
+
+  const handleCellKey = (e, row, col) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault()
+      if (mode === 'setup') handleSetupTap(row, col)
+      if (mode === 'play') handlePlayTap(row, col)
+    }
   }
 
   const getRowClass = (row) => {
@@ -200,21 +234,35 @@ function App() {
     return 'grid-row inactive'
   }
 
+  const statusText =
+    mode === 'setup'
+      ? `Setup mode. ${secretPath.filter((v) => v !== null).length} of ${rows} rows filled.`
+      : mode === 'play'
+        ? `Playing. Row ${activeRow + 1} of ${rows}.`
+        : mode === 'lose'
+          ? 'Wrong cell. Press Retry to try again.'
+          : 'You made it!'
+
   return (
     <div className="app">
       <div className="game-container">
+        {/* Live status for screen readers */}
+        <div className="sr-only" aria-live="polite" aria-atomic="true">
+          {statusText}
+        </div>
+
         {/* Header */}
-        <div className="header">
+        <header className="header">
           <div className="title-row">
             <div className="logo">
-              <span className="logo-icon">🐸</span>
+              <span className="logo-icon" aria-hidden="true">🐸</span>
               <h1>Tap Hop</h1>
             </div>
             <div className="title-actions">
               {mode === 'setup' && (
                 <>
                   <button className="btn btn-dice" onClick={randomizePath} aria-label="Randomize path">
-                    🎲
+                    <span aria-hidden="true">🎲</span>
                   </button>
                   <button className="btn btn-lock" onClick={lockPath}>
                     Play
@@ -223,7 +271,7 @@ function App() {
               )}
               {mode === 'play' && (
                 <button className="btn btn-icon" onClick={editPath} aria-label="Edit path">
-                  ✏️
+                  <span aria-hidden="true">✏️</span>
                 </button>
               )}
               {mode === 'lose' && (
@@ -233,15 +281,16 @@ function App() {
               )}
             </div>
           </div>
-        </div>
+        </header>
 
         {/* Grid size controls */}
         {mode === 'setup' && (
-          <div className="size-controls">
+          <div className="size-controls" role="group" aria-label="Grid size">
             <div className="size-stepper">
               <button
                 className="btn btn-step"
                 disabled={cols <= MIN_COLS}
+                aria-label={`Remove column, currently ${cols} columns`}
                 onClick={() => {
                   const newCols = cols - 1
                   setCols(newCols)
@@ -255,11 +304,13 @@ function App() {
               <button
                 className="btn btn-step"
                 disabled={cols >= MAX_COLS}
+                aria-label={`Add column, currently ${cols} columns`}
                 onClick={() => setCols((c) => c + 1)}
               >+</button>
               <button
                 className="btn btn-step"
                 disabled={rows <= MIN_ROWS}
+                aria-label={`Remove row, currently ${rows} rows`}
                 onClick={() => {
                   setRows((r) => r - 1)
                   setSecretPath((prev) => prev.slice(0, -1))
@@ -268,6 +319,7 @@ function App() {
               <button
                 className="btn btn-step"
                 disabled={rows >= MAX_ROWS}
+                aria-label={`Add row, currently ${rows} rows`}
                 onClick={() => {
                   setRows((r) => r + 1)
                   setSecretPath((prev) => [...prev, null])
@@ -278,25 +330,32 @@ function App() {
         )}
 
         {/* Warning */}
-        {warning && <div className="warning">{warning}</div>}
+        {warning && <div className="warning" role="alert">{warning}</div>}
 
         {/* Grid */}
-        <div className="grid">
-            {/* Rows */}
+        <div className="grid" role="grid" aria-label={`${cols} by ${rows} game grid`}>
             {Array.from({ length: rows }, (_, r) => (
-              <div className={getRowClass(r)} key={r} style={{ gridTemplateColumns: `repeat(${cols}, 1fr)` }}>
-                {Array.from({ length: cols }, (_, c) => (
-                  <div
-                    key={c}
-                    className={getCellClass(r, c)}
-                    onClick={() => {
-                      if (mode === 'setup') handleSetupTap(r, c)
-                      if (mode === 'play') handlePlayTap(r, c)
-                    }}
-                  >
-                    {c === 0 && <span className="row-number">{r + 1}</span>}
-                  </div>
-                ))}
+              <div className={getRowClass(r)} key={r} role="row" style={{ gridTemplateColumns: `repeat(${cols}, 1fr)` }}>
+                {Array.from({ length: cols }, (_, c) => {
+                  const interactive = isCellInteractive(r, c)
+                  return (
+                    <div
+                      key={c}
+                      className={getCellClass(r, c)}
+                      role="gridcell"
+                      aria-label={getCellLabel(r, c)}
+                      tabIndex={interactive ? 0 : -1}
+                      aria-disabled={!interactive}
+                      onClick={() => {
+                        if (mode === 'setup') handleSetupTap(r, c)
+                        if (mode === 'play') handlePlayTap(r, c)
+                      }}
+                      onKeyDown={(e) => handleCellKey(e, r, c)}
+                    >
+                      {c === 0 && <span className="row-number" aria-hidden="true">{r + 1}</span>}
+                    </div>
+                  )
+                })}
               </div>
             ))}
           </div>
@@ -306,8 +365,8 @@ function App() {
       {mode === 'win' && (
         <>
           <Confetti />
-          <div className="win-overlay">
-            <div className="emoji">🎉</div>
+          <div className="win-overlay" role="dialog" aria-label="You won">
+            <div className="emoji" aria-hidden="true">🎉</div>
             <h2>YOU MADE IT!</h2>
             <button className="btn btn-setup" onClick={playAgain}>
               Play Again

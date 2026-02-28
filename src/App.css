@@ -1,3 +1,16 @@
+/* ── Screen reader only ── */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
 /* ── Layout ── */
 .app {
   display: flex;
@@ -49,7 +62,7 @@
 .progress {
   font-size: 1rem;
   font-weight: 600;
-  color: #64b5f6;
+  color: #90caf9;
   margin-bottom: 8px;
 }
 
@@ -68,41 +81,52 @@
   opacity: 0.8;
 }
 
+/* AAA focus: visible high-contrast outline */
+.btn:focus-visible {
+  outline: 3px solid #fff;
+  outline-offset: 2px;
+}
+
 .btn-setup {
-  background: #4caf50;
+  background: #1b5e20;
 }
 
 .btn-lock {
-  background: #2196f3;
+  background: #0d47a1;
 }
 
 .btn-edit {
-  background: #9c27b0;
+  background: #6a1b9a;
 }
 
 .btn-dice {
   background: transparent;
   font-size: 1.6rem;
-  padding: 6px 10px;
+  padding: 10px;
+  min-width: 44px;
+  min-height: 44px;
   line-height: 1;
 }
 
 .btn-icon {
   background: transparent;
   font-size: 1.4rem;
-  padding: 6px 10px;
+  padding: 10px;
+  min-width: 44px;
+  min-height: 44px;
   line-height: 1;
 }
 
 .btn-retry {
-  background: #e53935;
+  background: #b71c1c;
 }
 
 .btn-step {
   background: #444;
   padding: 4px 10px;
   font-size: 0.85rem;
-  min-width: 32px;
+  min-width: 44px;
+  min-height: 44px;
 }
 
 .btn-step:disabled {
@@ -123,7 +147,7 @@
 }
 
 .size-label {
-  color: #888;
+  color: #b0b0b0;
   font-size: 0.85rem;
   font-weight: 600;
   min-width: 40px;
@@ -137,7 +161,7 @@
 
 /* ── Warning ── */
 .warning {
-  background: #ff5722;
+  background: #b71c1c;
   color: #fff;
   padding: 8px 14px;
   border-radius: 8px;
@@ -149,7 +173,7 @@
 
 .row-number {
   font-size: 0.6rem;
-  color: #555;
+  color: #9e9e9e;
   pointer-events: none;
   position: absolute;
   top: 3px;
@@ -193,6 +217,12 @@
   justify-content: center;
 }
 
+.cell:focus-visible {
+  outline: 3px solid #fff;
+  outline-offset: 2px;
+  z-index: 1;
+}
+
 /* Disabled: not a valid option */
 .cell.disabled {
   opacity: 0.15;
@@ -202,13 +232,13 @@
 /* Option: valid next move */
 .cell.option {
   background: #1a3a1a;
-  border-color: #4caf5066;
+  border-color: #4caf50;
 }
 
 /* Setup mode: selected square */
 .cell.setup-selected {
   background: #1b5e20;
-  border-color: #4caf50;
+  border-color: #66bb6a;
 }
 
 /* Play mode: correct (stays green) */
@@ -244,6 +274,15 @@
   50% {
     box-shadow: 0 0 14px rgba(100, 181, 246, 0.6);
     border-color: rgba(100, 181, 246, 0.6);
+  }
+}
+
+/* ── Reduced motion ── */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
   }
 }
 
