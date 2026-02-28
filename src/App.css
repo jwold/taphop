@@ -224,7 +224,7 @@
 
 /* Disabled: not a valid option */
 .cell.disabled {
-  opacity: 0.15;
+  opacity: 0.45;
   pointer-events: none;
 }
 
