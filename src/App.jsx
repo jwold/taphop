@@ -134,12 +134,6 @@ function App() {
     [mode, activeRow, secretPath]
   )
 
-  const resetGame = useCallback(() => {
-    setActiveRow(0)
-    setCompletedCells([])
-    setMode('play')
-  }, [])
-
   const editPath = useCallback(() => {
     setMode('setup')
     setActiveRow(0)
@@ -217,14 +211,9 @@ function App() {
           )}
 
           {mode === 'play' && (
-            <>
-              <button className="btn btn-reset" onClick={resetGame}>
-                Reset Game
-              </button>
-              <button className="btn btn-edit" onClick={editPath}>
-                Edit Path
-              </button>
-            </>
+            <button className="btn btn-edit" onClick={editPath}>
+              Edit Path
+            </button>
           )}
         </div>
 
