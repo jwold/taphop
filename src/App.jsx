@@ -212,15 +212,10 @@ function App() {
           <div className="mode-label">
             {mode === 'idle' && 'Tap "Setup Path" to begin'}
             {mode === 'setup' && 'Leader: tap one square per row'}
-            {mode === 'play' && 'Find the secret path!'}
+            {mode === 'play' && ''}
             {mode === 'win' && ''}
           </div>
 
-          {mode === 'play' && (
-            <div className="progress">
-              Step {activeRow + 1} of {ROWS}
-            </div>
-          )}
         </div>
 
         {/* Controls */}
