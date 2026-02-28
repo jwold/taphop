@@ -188,24 +188,7 @@ function App() {
         {warning && <div className="warning">{warning}</div>}
 
         {/* Grid */}
-        <div className="grid-wrapper">
-          <div className="row-labels">
-            {Array.from({ length: ROWS }, (_, r) => (
-              <div className="row-label" key={r}>
-                R{r + 1}
-              </div>
-            ))}
-          </div>
-          <div className="grid">
-            {/* Column headers */}
-            <div className="col-headers">
-              {Array.from({ length: COLS }, (_, c) => (
-                <div className="col-header" key={c}>
-                  C{c + 1}
-                </div>
-              ))}
-            </div>
-
+        <div className="grid">
             {/* Rows */}
             {Array.from({ length: ROWS }, (_, r) => (
               <div className={getRowClass(r)} key={r}>
@@ -223,7 +206,6 @@ function App() {
             ))}
           </div>
         </div>
-      </div>
 
       {/* Win Screen */}
       {mode === 'win' && (
