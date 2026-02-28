@@ -16,18 +16,13 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  height: 100vh;
-  padding: 16px;
-  overflow: hidden;
+  min-height: 100vh;
+  padding: 16px 8px 32px;
 }
 
 .game-container {
   width: 100%;
-  max-width: 100%;
-  display: flex;
-  flex-direction: column;
-  flex: 1;
-  min-height: 0;
+  max-width: 420px;
 }
 
 /* ── Header / Controls ── */
@@ -138,6 +133,25 @@
   cursor: not-allowed;
 }
 
+.size-controls {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 10px;
+}
+
+.size-stepper {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.size-label {
+  color: #b0b0b0;
+  font-size: 0.85rem;
+  font-weight: 600;
+  min-width: 40px;
+  text-align: center;
+}
 
 .btn-disabled {
   opacity: 0.4;
@@ -156,34 +170,26 @@
   margin-bottom: 10px;
 }
 
-.size-controls {
-  display: flex;
-  justify-content: center;
-  margin-bottom: 10px;
-}
-
-.size-stepper {
-  display: flex;
-  align-items: center;
-  gap: 6px;
+.row-number {
+  font-size: 0.6rem;
+  color: #9e9e9e;
+  pointer-events: none;
+  position: absolute;
+  top: 3px;
+  left: 5px;
+  line-height: 1;
 }
 
 /* ── Grid ── */
 .grid {
-  display: flex;
-  gap: 6px;
-  justify-content: center;
-  flex: 1;
-  min-height: 0;
+  width: 100%;
 }
 
 .grid-row {
-  display: flex;
-  flex-direction: column;
+  display: grid;
   gap: 6px;
+  margin-bottom: 6px;
   transition: opacity 0.3s;
-  flex: 1;
-  min-width: 0;
 }
 
 .grid-row.inactive {
@@ -198,9 +204,8 @@
 /* ── Cells ── */
 .cell {
   position: relative;
-  min-width: 44px;
-  flex: 1;
-  min-height: 44px;
+  height: 52px;
+  min-width: 56px;
   border-radius: 10px;
   background: #2e2e3e;
   cursor: pointer;
