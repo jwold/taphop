@@ -2,7 +2,7 @@ import { useState, useCallback, useRef } from 'react'
 import './App.css'
 
 const MIN_ROWS = 2
-const MAX_ROWS = 5
+const MAX_ROWS = 10
 const MIN_COLS = 2
 const MAX_COLS = 5
 
