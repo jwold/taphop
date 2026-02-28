@@ -114,8 +114,11 @@ function App() {
   }, [])
 
   const editPath = useCallback(() => {
-    startSetup()
-  }, [startSetup])
+    setMode('setup')
+    setActiveRow(0)
+    setCompletedCells([])
+    setWarning('')
+  }, [])
 
   const playAgain = useCallback(() => {
     setActiveRow(0)
