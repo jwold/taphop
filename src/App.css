@@ -43,8 +43,8 @@
 }
 
 .logo-icon {
-  font-size: 1.8rem;
-  line-height: 1;
+  display: block;
+  flex-shrink: 0;
 }
 
 .logo h1 {

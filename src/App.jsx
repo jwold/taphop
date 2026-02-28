@@ -6,6 +6,30 @@ const MAX_ROWS = 12
 const MIN_COLS = 2
 const MAX_COLS = 5
 
+function FrogIcon() {
+  return (
+    <svg width="32" height="32" viewBox="0 0 32 32" fill="none" aria-hidden="true" className="logo-icon">
+      {/* Body */}
+      <ellipse cx="16" cy="20" rx="11" ry="8" fill="#4caf50" />
+      {/* Belly */}
+      <ellipse cx="16" cy="22" rx="7" ry="5" fill="#a5d6a7" />
+      {/* Left eye */}
+      <circle cx="10" cy="11" r="5" fill="#4caf50" />
+      <circle cx="10" cy="11" r="3.5" fill="#fff" />
+      <circle cx="10.5" cy="10.5" r="1.8" fill="#1b5e20" />
+      {/* Right eye */}
+      <circle cx="22" cy="11" r="5" fill="#4caf50" />
+      <circle cx="22" cy="11" r="3.5" fill="#fff" />
+      <circle cx="22.5" cy="10.5" r="1.8" fill="#1b5e20" />
+      {/* Mouth */}
+      <path d="M11 22 Q16 26 21 22" stroke="#1b5e20" strokeWidth="1.2" fill="none" strokeLinecap="round" />
+      {/* Cheeks */}
+      <circle cx="9" cy="20" r="2" fill="#ff8a80" opacity="0.4" />
+      <circle cx="23" cy="20" r="2" fill="#ff8a80" opacity="0.4" />
+    </svg>
+  )
+}
+
 function getValidCols(prevCol, cols) {
   if (prevCol === null || prevCol === undefined) return Array.from({ length: cols }, (_, i) => i)
   const valid = [prevCol]
@@ -255,7 +279,7 @@ function App() {
         <header className="header">
           <div className="title-row">
             <div className="logo">
-              <span className="logo-icon" aria-hidden="true">🐸</span>
+              <FrogIcon />
               <h1>Tap Hop</h1>
             </div>
             <div className="title-actions">
