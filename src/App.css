@@ -98,6 +98,38 @@
   background: #e53935;
 }
 
+.btn-step {
+  background: #444;
+  padding: 4px 10px;
+  font-size: 0.85rem;
+  min-width: 32px;
+}
+
+.btn-step:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+.size-controls {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 10px;
+}
+
+.size-stepper {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.size-label {
+  color: #888;
+  font-size: 0.85rem;
+  font-weight: 600;
+  min-width: 40px;
+  text-align: center;
+}
+
 .btn-disabled {
   opacity: 0.4;
   cursor: not-allowed;
@@ -122,7 +154,6 @@
 
 .grid-row {
   display: grid;
-  grid-template-columns: repeat(5, 1fr);
   gap: 6px;
   margin-bottom: 6px;
   transition: opacity 0.3s;

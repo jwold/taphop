@@ -1,14 +1,16 @@
 import { useState, useCallback, useRef } from 'react'
 import './App.css'
 
-const ROWS = 10
-const COLS = 5
+const MIN_ROWS = 5
+const MAX_ROWS = 12
+const MIN_COLS = 2
+const MAX_COLS = 5
 
-function getValidCols(prevCol) {
-  if (prevCol === null || prevCol === undefined) return [0, 1, 2, 3, 4]
+function getValidCols(prevCol, cols) {
+  if (prevCol === null || prevCol === undefined) return Array.from({ length: cols }, (_, i) => i)
   const valid = [prevCol]
   if (prevCol > 0) valid.push(prevCol - 1)
-  if (prevCol < COLS - 1) valid.push(prevCol + 1)
+  if (prevCol < cols - 1) valid.push(prevCol + 1)
   return valid
 }
 
@@ -49,10 +51,13 @@ function Confetti() {
 }
 
 function App() {
+  // Grid size
+  const [rows, setRows] = useState(10)
+  const [cols, setCols] = useState(5)
   // Game modes: 'setup' | 'play' | 'win' | 'lose'
   const [mode, setMode] = useState('setup')
-  // Secret path: array of 10 column indices (0-4), null = not set
-  const [secretPath, setSecretPath] = useState(() => Array(ROWS).fill(null))
+  // Secret path: array of row column indices, null = not set
+  const [secretPath, setSecretPath] = useState(() => Array(10).fill(null))
   // Play state
   const [activeRow, setActiveRow] = useState(0)
   const [completedCells, setCompletedCells] = useState([])
@@ -63,46 +68,46 @@ function App() {
 
   const startSetup = useCallback(() => {
     setMode('setup')
-    setSecretPath(Array(ROWS).fill(null))
+    setSecretPath(Array(rows).fill(null))
     setActiveRow(0)
     setCompletedCells([])
     setWarning('')
-  }, [])
+  }, [rows])
 
   const handleSetupTap = useCallback(
     (row, col) => {
       if (mode !== 'setup') return
       const prevCol = row === 0 ? null : secretPath[row - 1]
-      if (!getValidCols(prevCol).includes(col)) return
+      if (!getValidCols(prevCol, cols).includes(col)) return
       setWarning('')
       setSecretPath((prev) => {
         const next = [...prev]
         next[row] = col
         // Clear downstream rows that are no longer adjacent
-        for (let r = row + 1; r < ROWS; r++) {
+        for (let r = row + 1; r < rows; r++) {
           if (next[r] === null) break
-          const valid = getValidCols(next[r - 1])
+          const valid = getValidCols(next[r - 1], cols)
           if (!valid.includes(next[r])) {
-            for (let clear = r; clear < ROWS; clear++) next[clear] = null
+            for (let clear = r; clear < rows; clear++) next[clear] = null
             break
           }
         }
         return next
       })
     },
-    [mode, secretPath]
+    [mode, secretPath, rows, cols]
   )
 
   const randomizePath = useCallback(() => {
-    const path = Array(ROWS).fill(null)
-    path[0] = Math.floor(Math.random() * COLS)
-    for (let r = 1; r < ROWS; r++) {
-      const valid = getValidCols(path[r - 1])
+    const path = Array(rows).fill(null)
+    path[0] = Math.floor(Math.random() * cols)
+    for (let r = 1; r < rows; r++) {
+      const valid = getValidCols(path[r - 1], cols)
       path[r] = valid[Math.floor(Math.random() * valid.length)]
     }
     setSecretPath(path)
     setWarning('')
-  }, [])
+  }, [rows, cols])
 
   const lockPath = useCallback(() => {
     const incomplete = secretPath.some((v) => v === null)
@@ -125,7 +130,7 @@ function App() {
         // Correct!
         setCompletedCells((prev) => [...prev, { row, col }])
 
-        if (row === ROWS - 1) {
+        if (row === rows - 1) {
           setMode('win')
         } else {
           setActiveRow(row + 1)
@@ -136,7 +141,7 @@ function App() {
         setMode('lose')
       }
     },
-    [mode, activeRow, secretPath]
+    [mode, activeRow, secretPath, rows]
   )
 
   const editPath = useCallback(() => {
@@ -158,7 +163,7 @@ function App() {
 
     if (mode === 'setup') {
       const prevCol = row === 0 ? null : secretPath[row - 1]
-      const isValid = (row === 0 || prevCol !== null) && getValidCols(prevCol).includes(col)
+      const isValid = (row === 0 || prevCol !== null) && getValidCols(prevCol, cols).includes(col)
       if (secretPath[row] === col) {
         classes.push('setup-selected')
       } else if (isValid) {
@@ -177,7 +182,7 @@ function App() {
       }
       if (mode === 'play' && row === activeRow) {
         const prevCol = row === 0 ? null : secretPath[row - 1]
-        if (getValidCols(prevCol).includes(col)) {
+        if (getValidCols(prevCol, cols).includes(col)) {
           classes.push('option')
         }
       }
@@ -230,15 +235,44 @@ function App() {
           </div>
         </div>
 
+        {/* Grid size controls */}
+        {mode === 'setup' && (
+          <div className="size-controls">
+            <div className="size-stepper">
+              <span className="size-label">{cols}×{rows}</span>
+              <button
+                className="btn btn-step"
+                disabled={cols <= MIN_COLS}
+                onClick={() => { setCols((c) => c - 1); setSecretPath(Array(rows).fill(null)) }}
+              >−</button>
+              <button
+                className="btn btn-step"
+                disabled={cols >= MAX_COLS}
+                onClick={() => { setCols((c) => c + 1); setSecretPath(Array(rows).fill(null)) }}
+              >+</button>
+              <button
+                className="btn btn-step"
+                disabled={rows <= MIN_ROWS}
+                onClick={() => { setRows((r) => r - 1); setSecretPath(Array(rows - 1).fill(null)) }}
+              >↑</button>
+              <button
+                className="btn btn-step"
+                disabled={rows >= MAX_ROWS}
+                onClick={() => { setRows((r) => r + 1); setSecretPath(Array(rows + 1).fill(null)) }}
+              >↓</button>
+            </div>
+          </div>
+        )}
+
         {/* Warning */}
         {warning && <div className="warning">{warning}</div>}
 
         {/* Grid */}
         <div className="grid">
             {/* Rows */}
-            {Array.from({ length: ROWS }, (_, r) => (
-              <div className={getRowClass(r)} key={r}>
-                {Array.from({ length: COLS }, (_, c) => (
+            {Array.from({ length: rows }, (_, r) => (
+              <div className={getRowClass(r)} key={r} style={{ gridTemplateColumns: `repeat(${cols}, 1fr)` }}>
+                {Array.from({ length: cols }, (_, c) => (
                   <div
                     key={c}
                     className={getCellClass(r, c)}
