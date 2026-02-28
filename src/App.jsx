@@ -1,4 +1,4 @@
-import { useState, useCallback, useRef, useEffect } from 'react'
+import { useState, useCallback } from 'react'
 import './App.css'
 
 const ROWS = 10
@@ -48,31 +48,14 @@ function App() {
   // Play state
   const [activeRow, setActiveRow] = useState(0)
   const [completedCells, setCompletedCells] = useState([])
-  // Flash state: { row, col, type: 'correct'|'wrong' }
-  const [flash, setFlash] = useState(null)
-  // Banner: { type: 'correct'|'wrong' }
-  const [banner, setBanner] = useState(null)
   // Warning message
   const [warning, setWarning] = useState('')
-
-  const flashTimeout = useRef(null)
-  const bannerTimeout = useRef(null)
-
-  // Cleanup timeouts on unmount
-  useEffect(() => {
-    return () => {
-      clearTimeout(flashTimeout.current)
-      clearTimeout(bannerTimeout.current)
-    }
-  }, [])
 
   const startSetup = useCallback(() => {
     setMode('setup')
     setSecretPath(Array(ROWS).fill(null))
     setActiveRow(0)
     setCompletedCells([])
-    setFlash(null)
-    setBanner(null)
     setWarning('')
   }, [])
 
@@ -105,59 +88,28 @@ function App() {
     (row, col) => {
       if (mode !== 'play') return
       if (row !== activeRow) return
-      if (flash) return // ignore taps during flash
 
       if (col === secretPath[row]) {
         // Correct!
-        setFlash({ row, col, type: 'correct' })
-        setBanner({ type: 'correct' })
+        setCompletedCells((prev) => [...prev, { row, col }])
 
-        clearTimeout(flashTimeout.current)
-        clearTimeout(bannerTimeout.current)
-
-        flashTimeout.current = setTimeout(() => {
-          setFlash(null)
-          setCompletedCells((prev) => [...prev, { row, col }])
-
-          if (row === ROWS - 1) {
-            // Won!
-            setMode('win')
-            setBanner(null)
-          } else {
-            setActiveRow(row + 1)
-          }
-        }, 400)
-
-        bannerTimeout.current = setTimeout(() => {
-          setBanner(null)
-        }, 600)
+        if (row === ROWS - 1) {
+          setMode('win')
+        } else {
+          setActiveRow(row + 1)
+        }
       } else {
-        // Wrong!
-        setFlash({ row, col, type: 'wrong' })
-        setBanner({ type: 'wrong' })
-
-        clearTimeout(flashTimeout.current)
-        clearTimeout(bannerTimeout.current)
-
-        flashTimeout.current = setTimeout(() => {
-          setFlash(null)
-          setActiveRow(0)
-          setCompletedCells([])
-        }, 700)
-
-        bannerTimeout.current = setTimeout(() => {
-          setBanner(null)
-        }, 700)
+        // Wrong — reset to start
+        setActiveRow(0)
+        setCompletedCells([])
       }
     },
-    [mode, activeRow, secretPath, flash]
+    [mode, activeRow, secretPath]
   )
 
   const resetGame = useCallback(() => {
     setActiveRow(0)
     setCompletedCells([])
-    setFlash(null)
-    setBanner(null)
     setMode('play')
   }, [])
 
@@ -168,8 +120,6 @@ function App() {
   const playAgain = useCallback(() => {
     setActiveRow(0)
     setCompletedCells([])
-    setFlash(null)
-    setBanner(null)
     setMode('play')
   }, [])
 
@@ -186,10 +136,6 @@ function App() {
       }
     }
 
-    if (flash && flash.row === row && flash.col === col) {
-      classes.push(flash.type === 'correct' ? 'flash-correct' : 'flash-wrong')
-    }
-
     return classes.join(' ')
   }
 
@@ -198,8 +144,6 @@ function App() {
     if (mode !== 'play') return 'grid-row inactive'
 
     if (row === activeRow) return 'grid-row active-row'
-    // Allow flash row to stay visible during wrong-flash reset
-    if (flash && flash.row === row) return 'grid-row active-row'
     return 'grid-row inactive'
   }
 
@@ -277,17 +221,6 @@ function App() {
           </div>
         </div>
       </div>
-
-      {/* Banner */}
-      {banner && (
-        <div
-          className={`banner ${
-            banner.type === 'correct' ? 'banner-correct' : 'banner-wrong'
-          }`}
-        >
-          {banner.type === 'correct' ? '👍 Correct! Keep going!' : '❌ Wrong! Start again.'}
-        </div>
-      )}
 
       {/* Win Screen */}
       {mode === 'win' && (
