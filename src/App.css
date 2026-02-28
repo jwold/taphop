@@ -147,6 +147,16 @@
   margin-bottom: 10px;
 }
 
+.row-number {
+  font-size: 0.6rem;
+  color: #555;
+  pointer-events: none;
+  position: absolute;
+  top: 3px;
+  left: 5px;
+  line-height: 1;
+}
+
 /* ── Grid ── */
 .grid {
   width: 100%;
@@ -170,6 +180,7 @@
 
 /* ── Cells ── */
 .cell {
+  position: relative;
   height: 52px;
   min-width: 56px;
   border-radius: 10px;

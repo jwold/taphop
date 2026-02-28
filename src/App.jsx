@@ -293,7 +293,9 @@ function App() {
                       if (mode === 'setup') handleSetupTap(r, c)
                       if (mode === 'play') handlePlayTap(r, c)
                     }}
-                  />
+                  >
+                    {c === 0 && <span className="row-number">{r + 1}</span>}
+                  </div>
                 ))}
               </div>
             ))}
