@@ -348,84 +348,80 @@ function App() {
           </div>
         </header>
 
-        {/* Warning */}
-        {warning && <div className="warning" role="alert">{warning}</div>}
-
-        {/* Height controls (top = add row, contextual) */}
+        {/* Grid size controls */}
         {mode === 'setup' && (
-          <div className="row-controls" role="group" aria-label="Row height">
-            <button
-              className="btn btn-step"
-              disabled={cols >= MAX_COLS}
-              aria-label={`Add height, currently ${cols} cells tall`}
-              onClick={() => setCols((c) => c + 1)}
-            >+</button>
-            <button
-              className="btn btn-step"
-              disabled={cols <= MIN_COLS}
-              aria-label={`Remove height, currently ${cols} cells tall`}
-              onClick={() => {
-                const newCols = cols - 1
-                setCols(newCols)
-                setSecretPath((prev) => prev.map((v) => v !== null && v >= newCols ? null : v).map((v, i, arr) => {
-                  if (i === 0 || v === null) return v
-                  if (arr[i - 1] === null) return null
-                  return getValidCols(arr[i - 1], newCols).includes(v) ? v : null
-                }))
-              }}
-            >−</button>
+          <div className="size-controls" role="group" aria-label="Grid size">
+            <div className="size-stepper">
+              <button
+                className="btn btn-step"
+                disabled={cols <= MIN_COLS}
+                aria-label={`Remove height, currently ${cols} cells tall`}
+                onClick={() => {
+                  const newCols = cols - 1
+                  setCols(newCols)
+                  setSecretPath((prev) => prev.map((v) => v !== null && v >= newCols ? null : v).map((v, i, arr) => {
+                    if (i === 0 || v === null) return v
+                    if (arr[i - 1] === null) return null
+                    return getValidCols(arr[i - 1], newCols).includes(v) ? v : null
+                  }))
+                }}
+              >−</button>
+              <button
+                className="btn btn-step"
+                disabled={cols >= MAX_COLS}
+                aria-label={`Add height, currently ${cols} cells tall`}
+                onClick={() => setCols((c) => c + 1)}
+              >+</button>
+              <button
+                className="btn btn-step"
+                disabled={rows <= MIN_ROWS}
+                aria-label={`Remove column, currently ${rows} columns`}
+                onClick={() => {
+                  setRows((r) => r - 1)
+                  setSecretPath((prev) => prev.slice(0, -1))
+                }}
+              >←</button>
+              <button
+                className="btn btn-step"
+                disabled={rows >= MAX_ROWS}
+                aria-label={`Add column, currently ${rows} columns`}
+                onClick={() => {
+                  setRows((r) => r + 1)
+                  setSecretPath((prev) => [...prev, null])
+                }}
+              >→</button>
+            </div>
           </div>
         )}
 
-        {/* Grid (rotated: each step is a vertical column, path goes left to right) */}
-        <div className="grid-wrapper">
-          {mode === 'setup' && (
-            <button
-              className="btn btn-step btn-step-side"
-              disabled={rows <= MIN_ROWS}
-              aria-label={`Remove step, currently ${rows} steps`}
-              onClick={() => {
-                setRows((r) => r - 1)
-                setSecretPath((prev) => prev.slice(0, -1))
-              }}
-            >−</button>
-          )}
-          <div className="grid" role="grid" aria-label={`${rows} steps, ${cols} choices each`}>
-              {Array.from({ length: rows }, (_, r) => (
-                <div className={getRowClass(r)} key={r} role="row" style={{ gridTemplateRows: `repeat(${cols}, 1fr)` }}>
-                  <span className="col-number" aria-hidden="true">{r + 1}</span>
-                  {Array.from({ length: cols }, (_, c) => {
-                    const interactive = isCellInteractive(r, c)
-                    return (
-                      <div
-                        key={c}
-                        className={getCellClass(r, c)}
-                        role="gridcell"
-                        aria-label={getCellLabel(r, c)}
-                        tabIndex={interactive ? 0 : -1}
-                        aria-disabled={!interactive}
-                        onClick={() => {
-                          if (mode === 'setup') handleSetupTap(r, c)
-                          if (mode === 'play') handlePlayTap(r, c)
-                        }}
-                        onKeyDown={(e) => handleCellKey(e, r, c)}
-                      />
-                    )
-                  })}
-                </div>
-              ))}
-          </div>
-          {mode === 'setup' && (
-            <button
-              className="btn btn-step btn-step-side"
-              disabled={rows >= MAX_ROWS}
-              aria-label={`Add step, currently ${rows} steps`}
-              onClick={() => {
-                setRows((r) => r + 1)
-                setSecretPath((prev) => [...prev, null])
-              }}
-            >+</button>
-          )}
+        {/* Warning */}
+        {warning && <div className="warning" role="alert">{warning}</div>}
+
+        {/* Grid (each step is a vertical column, path goes left to right) */}
+        <div className="grid" role="grid" aria-label={`${rows} steps, ${cols} choices each`}>
+            {Array.from({ length: rows }, (_, r) => (
+              <div className={getRowClass(r)} key={r} role="row" style={{ gridTemplateRows: `repeat(${cols}, 1fr)` }}>
+                <span className="col-number" aria-hidden="true">{r + 1}</span>
+                {Array.from({ length: cols }, (_, c) => {
+                  const interactive = isCellInteractive(r, c)
+                  return (
+                    <div
+                      key={c}
+                      className={getCellClass(r, c)}
+                      role="gridcell"
+                      aria-label={getCellLabel(r, c)}
+                      tabIndex={interactive ? 0 : -1}
+                      aria-disabled={!interactive}
+                      onClick={() => {
+                        if (mode === 'setup') handleSetupTap(r, c)
+                        if (mode === 'play') handlePlayTap(r, c)
+                      }}
+                      onKeyDown={(e) => handleCellKey(e, r, c)}
+                    />
+                  )
+                })}
+              </div>
+            ))}
         </div>
         </div>
 

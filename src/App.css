@@ -159,29 +159,23 @@
   padding-bottom: 2px;
 }
 
-.row-controls {
+.size-controls {
   display: flex;
   justify-content: center;
+  margin-bottom: 10px;
+}
+
+.size-stepper {
+  display: flex;
+  align-items: center;
   gap: 6px;
-  margin-bottom: 8px;
 }
 
 /* ── Grid ── */
-.grid-wrapper {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.btn-step-side {
-  flex-shrink: 0;
-}
-
 .grid {
   display: flex;
   gap: 6px;
-  overflow-x: auto;
-  flex: 1;
+  justify-content: center;
 }
 
 .grid-row {
